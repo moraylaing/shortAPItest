@@ -3,18 +3,24 @@
 var express = require('express');
 var mongo = require('mongodb');
 var mongoose = require('mongoose');
-
 var cors = require('cors');
-
 var app = express();
-
 // Basic Configuration 
 var port = process.env.PORT || 3000;
 
-/** this project needs a db !! **/ 
-// mongoose.connect(process.env.DB_URI);
+const bodyParser=require('body-parser'); 
 
-app.use(cors());
+/** this project needs a db !! **/ 
+mongoose.connect(process.env.DB_URI); 
+ 
+var urlSchema = new mongoose.Schema({
+      orig_url: { type: String, required: true },
+      short_url: Number
+  });
+var URL = mongoose.model('URL', urlSchema);
+
+app.use(bodyParser.json()); 
+app.use(cors()); 
 
 /** this project needs to parse POST bodies **/
 // you should mount the body-parser here
@@ -35,3 +41,16 @@ app.get("/api/hello", function (req, res) {
 app.listen(port, function () {
   console.log('Node.js listening ...');
 });
+
+app.get("/api/shorturl/new/:url(*)", function (req, res, next) {
+  console.log("GET");  
+  var {url}= req.params; 
+  var cleanUrl = url.replace("https://", "");
+  console.log(cleanUrl);
+        
+  //(Step 6)
+  //(Step 7)
+  //(Step 8)
+  //(Step 9)
+});
+
