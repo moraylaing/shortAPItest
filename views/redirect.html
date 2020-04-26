@@ -1,32 +1,17 @@
 <!DOCTYPE html>
-
-<html ng-app="shortURLApp">
-
+<html >
    <head>
-  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
-     
-     
     <script src="app.js"></script>
      <title>Morays URL Shortener</title>
       <link rel="shortcut icon" href="https://cdn.hyperdev.com/us-east-1%3A52a203ff-088b-420f-81be-45bf559d01b1%2Ffavicon.ico" type="image/x-icon"/>
       <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet" type="text/css">
       <link href="/public/style.css" rel="stylesheet" type="text/css">
-     <h5>
-       Technologies: Node,Express, MongoDB, Mongoose, Javascript,Angular, Html, CSS and ootstrap
-     </h5>
    </head>
-
    <body
       <div class="container">
-        <h2>Moray's URL Shortener Microservice with MongoDB</h2>
-
-  <section ng-controller='shortAppCtrl'>
-  
-    <input placeholder="Enter URL" ng-model="urlToShorten">
-    <a  ng-href='/api/shorturl/new/{{urlToShorten}}'>Shorten URL</a>
+  <h2>Lets test that short URL</h2>
+  <section>
+    <a href='/api/testurl'>Test the URL</a>
   </section>
- 
    </body>
-
-
 </html>
