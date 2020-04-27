@@ -52,7 +52,7 @@ app.listen(port, function () {
 });
 
 app.get("/api/shorturl/new/:url(*)", function (req, res) {
-  console.log("GET The URL");  
+  //console.log("GET The URL");  
   var {url}= req.params; 
   let htmlString="<!DOCTYPE html><html> <head>";
   htmlString+=" <script src='app.js'></script>";
@@ -63,19 +63,22 @@ app.get("/api/shorturl/new/:url(*)", function (req, res) {
   htmlString+="  </head>";
   htmlString+="  <body";
   htmlString+="     <div class='container'>";
-  
-  if(url!="app.js")
+  url=url.toUpperCase();
+  console.log(url.indexOf("APP.JS"));
+  if(url.indexOf("APP.JS")<0)
   {
       var regex  =/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi;
-  if(regex.test(url)===true)
+  //console.log("test");
+    if(regex.test(url)===true)
     {
+      //console.log("true"); 
       var shortNum = Math.floor(Math.random()*100000).toString();
       var data = new shorturl(
       {
         orig_url: url,
         short_url: shortNum
       });
-      var test=true;
+       
       data.save(err=>
       { 
         
@@ -86,7 +89,7 @@ app.get("/api/shorturl/new/:url(*)", function (req, res) {
       }); 
         testshortURL = shortNum;
         testredirectURL=data.orig_url;
-        //console.log(testshortURL+"-"+testredirectURL);
+      console.log(testshortURL+"-"+testredirectURL);
       htmlString+=" <h2>Lets test that short URL</h2>";
   htmlString+=" <section>";
   htmlString+="   <a href='/api/testurl'>https://morayshortened-api.glitch.me/api/shorturl/redirect/"+shortNum+" </a>";
@@ -122,17 +125,17 @@ app.get("/api/shorturl/new/:url(*)", function (req, res) {
   
   
 });
-app.get("/api/testurl",(req,res)=>
+app.get("/api/testurl",(req,res,next)=>
 {
-  //console.log("test URL  "+testshortURL); 
   var strToCheck = testredirectURL;  
-  
-     // console.log(strToCheck);
+    console.log("test URL  "+testshortURL+" - "+strToCheck); 
 
-  var re = new RegExp("^(http|https)://","i");
+
+  var re = new RegExp("^(HTTP|HTTPS)://","i");
     if(re.test(strToCheck)) 
     { 
-      res.redirect(301,strToCheck);
+      console.log("GOTO :"+strToCheck.toLowerCase());
+      res.redirect(301,strToCheck.toLowerCase());
     }
     else
     {
@@ -147,21 +150,21 @@ app.get("/api/testurl",(req,res)=>
 app.get("/api/shorturl/redirect/:urlToForward(*)",(req,res,next)=>{
   //console.log("Redirect"); 
   var {urlToForward}= req.params; 
-  //console.log(urlToForward); 
+  console.log("url to forward "+urlToForward); 
 
   shorturl.findOne({'short_url':urlToForward}, (err,data)=>{
     if(err) return res.send('Error reading database');
     
-    var re = new RegExp("^(http|https)://","i");
+    var re = new RegExp("^(HTTP|HTTPS)://","i");
     var strToCheck = data.orig_url;
-    console.log(strToCheck);
+    console.log("test this "+strToCheck); 
     if(re.test(strToCheck))
     { 
       res.redirect(301,data.orig_url);
     }
     else
       {
-        res.redirect(301,'http://'+data.orig_url);
+        res.redirect(301,'HTTP://'+data.orig_url);
       }
   });
 });
