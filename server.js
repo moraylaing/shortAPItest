@@ -6,6 +6,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const app = express(); 
 let testshortURL='';
+let longURL='';
 let testredirectURL='';
 
 // Basic Configuration 
@@ -51,9 +52,15 @@ app.listen(port, function () {
   console.log('Node.js listening ...');
 });
 
-app.get("/api/shorturl/new/:url(*)", function (req, res) {
-  //console.log("GET The URL");  
+app.get("/api/shorturl/new/:url(*)", function (req, res, next) {
   var {url}= req.params; 
+  console.log(url.toUpperCase().indexOf("APP.JS"));
+  if(url.toUpperCase().indexOf("APP.JS")<0)
+  {
+    longURL=url;
+  }
+ 
+  console.log("GET The new HTML");  
   let htmlString="<!DOCTYPE html><html> <head>";
   htmlString+=" <script src='app.js'></script>";
   htmlString+="    <title>Morays URL Shortener</title>";
@@ -63,91 +70,63 @@ app.get("/api/shorturl/new/:url(*)", function (req, res) {
   htmlString+="  </head>";
   htmlString+="  <body";
   htmlString+="     <div class='container'>";
-  url=url.toUpperCase();
-  console.log(url.indexOf("APP.JS"));
-  if(url.indexOf("APP.JS")<0)
+  longURL=longURL.toUpperCase();
+  var regex  =/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi;
+  console.log("test long url "+longURL);
+  if(regex.test(longURL)===true)
   {
-      var regex  =/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi;
-  //console.log("test");
-    if(regex.test(url)===true)
+    console.log("its a valid URL"); 
+    var shortNum = Math.floor(Math.random()*100000).toString();
+    var data = new shorturl(
     {
-      //console.log("true"); 
-      var shortNum = Math.floor(Math.random()*100000).toString();
-      var data = new shorturl(
+      orig_url: longURL, 
+      short_url: shortNum
+    });
+    data.save(err=>
+    { 
+      if(err)
       {
-        orig_url: url,
-        short_url: shortNum
-      });
-       
-      data.save(err=>
-      { 
-        
-        if(err)
-        {
-           res.sendFile(process.cwd() + '/views/error.html');
-        }  
-      }); 
-        testshortURL = shortNum;
-        testredirectURL=data.orig_url;
-      console.log(testshortURL+"-"+testredirectURL);
-      htmlString+=" <h2>Lets test that short URL</h2>";
-  htmlString+=" <section>";
-  htmlString+="   <a href='/api/testurl'>https://morayshortened-api.glitch.me/api/shorturl/redirect/"+shortNum+" </a>";
-  htmlString+=" </section>";
-  htmlString+="  </body>";
-  htmlString+=" </html>";
-        return res.send(htmlString);
-        //return res.sendFile(process.cwd() + '/views/redirect.html');
-    
-      //return res.json(data); 
-    }
-    //var data = new shorturl(
-      //{
-      //  orig_url: "URL DOES MEET REQUIREMENTS FOR A VALID URL",
-      //  short_url: shortNum
-     // });
-    return res.sendFile(process.cwd() + '/views/invalid.html');
-    //return res.json(data);
-  
-  
-  //return res.json({url});
-        
-  //(Step 6)
-  //(Step 7) 
-  //(Step 8)
-  //(Step 9)
+         res.sendFile(process.cwd() + '/views/error.html');
+      }  
+    }); 
+    testshortURL = shortNum;
+    testredirectURL=data.orig_url;
+    console.log(testshortURL+"-"+testredirectURL);
+    htmlString+=" <h2>Lets test that short URL</h2>";
+    htmlString+=" <section>";
+    htmlString+="   <a href='/api/testit'>https://morayshortened-api.glitch.me/api/shorturl/redirect/"+shortNum+" </a>";
+    htmlString+=" </section>";
+    htmlString+="  </body>";
+    htmlString+=" </html>";
+    return res.send(htmlString);
   }
   else
   {
-    return res.sendFile(process.cwd() + '/views/redirect.html');
-
-  }
-  
-  
-});
-app.get("/api/testurl",(req,res,next)=>
+    return res.sendFile(process.cwd() + '/views/invalid.html');
+  } 
+}); 
+app.get("/api/testit", function (req, res) 
 {
-  var strToCheck = testredirectURL;  
-    console.log("test URL  "+testshortURL+" - "+strToCheck); 
+  console.log("GOTO LINK");
+  var strToCheck = testredirectURL.toLowerCase();  
+  console.log("test URL  "+testshortURL+" - "+strToCheck); 
 
 
   var re = new RegExp("^(HTTP|HTTPS)://","i");
-    if(re.test(strToCheck)) 
+    if(re.test(strToCheck))  
     { 
       console.log("GOTO :"+strToCheck.toLowerCase());
       res.redirect(301,strToCheck.toLowerCase());
     }
     else
     {
-      console.log("redirect");
+      console.log('redirect http://'+strToCheck);
       res.redirect(301,'http://'+strToCheck);
     }
-   
-
 });
 
 
-app.get("/api/shorturl/redirect/:urlToForward(*)",(req,res,next)=>{
+/*app.get("/api/shorturl/redirect/:urlToForward(*)",(req,res,next)=>{
   //console.log("Redirect"); 
   var {urlToForward}= req.params; 
   console.log("url to forward "+urlToForward); 
@@ -167,4 +146,4 @@ app.get("/api/shorturl/redirect/:urlToForward(*)",(req,res,next)=>{
         res.redirect(301,'HTTP://'+data.orig_url);
       }
   });
-});
+});*/
